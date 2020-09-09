@@ -1,0 +1,99 @@
+package io.github.gltomasz;
+
+import org.testcontainers.containers.JdbcDatabaseContainer;
+import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
+import org.testcontainers.utility.DockerImageName;
+import org.testcontainers.utility.MountableFile;
+
+import java.text.MessageFormat;
+import java.time.Duration;
+
+import static java.time.temporal.ChronoUnit.SECONDS;
+
+class InformixContainer<SELF extends InformixContainer<SELF>> extends JdbcDatabaseContainer<SELF> {
+
+    public static final int INFORMIX_PORT = 9088;
+    static final String DEFAULT_USER = "informix";
+    static final String DEFAULT_PASSWORD = "in4mix";
+
+    private String databaseName = "sysadmin";
+
+    public InformixContainer() {
+        this(DockerImageName.parse(InformixContainerProvider.FULL_IMAGE_NAME + ":latest"));
+    }
+
+    public InformixContainer(DockerImageName dockerImageName) {
+        super(dockerImageName);
+        this.waitStrategy = new LogMessageWaitStrategy()
+                .withRegEx(".*Maximum server connections 1.*")
+                .withTimes(1)
+                .withStartupTimeout(Duration.of(60, SECONDS));
+        addExposedPort(INFORMIX_PORT);
+    }
+
+    @Override
+    protected void configure() {
+        addEnv("LICENSE", "accept");
+    }
+
+    @Override
+    public String getDriverClassName() {
+        return "com.informix.jdbc.IfxDriver";
+    }
+
+    @Override
+    public String getJdbcUrl() {
+        String additionalUrlParams = constructUrlParameters("?", "&");
+        return MessageFormat.format("jdbc:informix-sqli://{0}:{1}/{2}:INFORMIXSERVER=informix{3}",
+                getContainerIpAddress(), getMappedPort(INFORMIX_PORT), getDatabaseName(), additionalUrlParams);
+
+//        return "jdbc:informix-sqli://" + getContainerIpAddress() + ":" + getMappedPort(INFORMIX_PORT)
+//                + "/" + getDatabaseName() + ":INFORMIXSERVER=informix" +  additionalUrlParams;
+    }
+
+    @Override
+    public String getUsername() {
+        return DEFAULT_USER;
+    }
+
+    @Override
+    public String getPassword() {
+        return DEFAULT_PASSWORD;
+    }
+
+    @Override
+    protected String getTestQueryString() {
+        return "select count(*) from systables";
+    }
+
+    @Override
+    protected void waitUntilContainerStarted() {
+        getWaitStrategy().waitUntilReady(this);
+    }
+
+    @Override
+    public SELF withDatabaseName(final String databaseName) {
+        this.databaseName = databaseName;
+        return self();
+    }
+
+    @Override
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
+    public SELF withInitFile(final String fileName) {
+        addEnv("INIT_FILE", fileName);
+        return self();
+    }
+
+    public SELF withPostInitFile(final String fileName) {
+        addEnv("RUN_FILE_POST_INIT", fileName);
+        return self();
+    }
+
+    @Override
+    public SELF withCopyFileToContainer(MountableFile mountableFile, String containerPath) {
+        return super.withCopyFileToContainer(mountableFile, containerPath);
+    }
+}
