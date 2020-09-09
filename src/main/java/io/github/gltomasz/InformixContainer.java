@@ -46,9 +46,6 @@ class InformixContainer<SELF extends InformixContainer<SELF>> extends JdbcDataba
         String additionalUrlParams = constructUrlParameters("?", "&");
         return MessageFormat.format("jdbc:informix-sqli://{0}:{1}/{2}:INFORMIXSERVER=informix{3}",
                 getContainerIpAddress(), getMappedPort(INFORMIX_PORT), getDatabaseName(), additionalUrlParams);
-
-//        return "jdbc:informix-sqli://" + getContainerIpAddress() + ":" + getMappedPort(INFORMIX_PORT)
-//                + "/" + getDatabaseName() + ":INFORMIXSERVER=informix" +  additionalUrlParams;
     }
 
     @Override
@@ -92,8 +89,4 @@ class InformixContainer<SELF extends InformixContainer<SELF>> extends JdbcDataba
         return self();
     }
 
-    @Override
-    public SELF withCopyFileToContainer(MountableFile mountableFile, String containerPath) {
-        return super.withCopyFileToContainer(mountableFile, containerPath);
-    }
 }

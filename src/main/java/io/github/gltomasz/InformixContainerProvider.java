@@ -30,12 +30,12 @@ public class InformixContainerProvider extends JdbcDatabaseContainerProvider {
         Map<String, String> containerParameters = url.getContainerParameters();
         InformixContainer result = newInformixInstance(url.getImageTag().orElse("latest"));
         if (containerParameters.containsKey(TC_INIT_IFX)) {
-            result.withCopyFileToContainer(MountableFile.forClasspathResource(containerParameters.get(TC_INIT_IFX)), IFX_CONFIG_DIR)
-                    .withInitFile(containerParameters.get(TC_INIT_IFX));
+            result.withInitFile(containerParameters.get(TC_INIT_IFX))
+                    .withCopyFileToContainer(MountableFile.forClasspathResource(containerParameters.get(TC_INIT_IFX)), IFX_CONFIG_DIR);
         }
         if (containerParameters.containsKey(TC_POSTINIT_IFX)) {
-            result.withCopyFileToContainer(MountableFile.forClasspathResource(containerParameters.get(TC_POSTINIT_IFX)), IFX_CONFIG_DIR)
-                    .withPostInitFile(containerParameters.get(TC_POSTINIT_IFX));
+            result.withPostInitFile(containerParameters.get(TC_POSTINIT_IFX))
+                    .withCopyFileToContainer(MountableFile.forClasspathResource(containerParameters.get(TC_POSTINIT_IFX)), IFX_CONFIG_DIR);
         }
         result.withDatabaseName(url.getDbHostString().replace("/", ""));
         result.withReuse(url.isReusable());
