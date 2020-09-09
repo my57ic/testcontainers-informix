@@ -1,5 +1,7 @@
 # testcontainers-informix
-Informix module for testcontainers (https://www.testcontainers.org/)
+Informix module for testcontainers (https://www.testcontainers.org/)  
+
+![Maven Package](https://github.com/gltomasz/testcontainers-informix/workflows/Maven%20Package/badge.svg)
 
 ### Usage
 
