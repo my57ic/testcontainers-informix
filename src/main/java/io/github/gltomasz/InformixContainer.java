@@ -5,6 +5,7 @@ import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
 
+import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.time.Duration;
 
@@ -15,7 +16,7 @@ class InformixContainer<SELF extends InformixContainer<SELF>> extends JdbcDataba
     public static final int INFORMIX_PORT = 9088;
     static final String DEFAULT_USER = "informix";
     static final String DEFAULT_PASSWORD = "in4mix";
-
+    private static final String IFX_CONFIG_DIR = "/opt/ibm/config/";
     private String databaseName = "sysadmin";
 
     public InformixContainer() {
@@ -45,7 +46,7 @@ class InformixContainer<SELF extends InformixContainer<SELF>> extends JdbcDataba
     public String getJdbcUrl() {
         String additionalUrlParams = constructUrlParameters("?", "&");
         return MessageFormat.format("jdbc:informix-sqli://{0}:{1}/{2}:INFORMIXSERVER=informix{3}",
-                getContainerIpAddress(), getMappedPort(INFORMIX_PORT), getDatabaseName(), additionalUrlParams);
+                getContainerIpAddress(), String.valueOf(getMappedPort(INFORMIX_PORT)), getDatabaseName(), additionalUrlParams);
     }
 
     @Override
@@ -79,14 +80,23 @@ class InformixContainer<SELF extends InformixContainer<SELF>> extends JdbcDataba
         return databaseName;
     }
 
-    public SELF withInitFile(final String fileName) {
-        addEnv("INIT_FILE", fileName);
+    public SELF withInitFile(MountableFile mountableFile) {
+        setEnvAndCopyFile(mountableFile, FileType.INIT_FILE);
         return self();
     }
 
-    public SELF withPostInitFile(final String fileName) {
-        addEnv("RUN_FILE_POST_INIT", fileName);
+    public SELF withPostInitFile(MountableFile mountableFile) {
+        setEnvAndCopyFile(mountableFile, FileType.RUN_FILE_POST_INIT);
         return self();
+    }
+
+    private void setEnvAndCopyFile(MountableFile mountableFile, FileType fileType) {
+        addEnv(fileType.toString(), Path.of(mountableFile.getFilesystemPath()).getFileName().toString());
+        withCopyFileToContainer(mountableFile, IFX_CONFIG_DIR);
+    }
+
+    private enum FileType {
+        INIT_FILE, RUN_FILE_POST_INIT
     }
 
 }
