@@ -44,7 +44,7 @@ class InformixContainer<SELF extends InformixContainer<SELF>> extends JdbcDataba
 
     @Override
     public String getJdbcUrl() {
-        String additionalUrlParams = constructUrlParameters("?", "&");
+        String additionalUrlParams = constructUrlParameters(";", ";");
         return MessageFormat.format("jdbc:informix-sqli://{0}:{1}/{2}:INFORMIXSERVER=informix{3}",
                 getContainerIpAddress(), String.valueOf(getMappedPort(INFORMIX_PORT)), getDatabaseName(), additionalUrlParams);
     }
