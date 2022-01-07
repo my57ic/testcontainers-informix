@@ -1,5 +1,7 @@
 package io.github.gltomasz;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -41,6 +43,6 @@ public class PlainJavaTest {
         }
       }
     }
-    System.out.println(schemas);
+    assertThat(schemas.get(0)).isEqualTo("test_database/informix");
   }
 }
