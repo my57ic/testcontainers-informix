@@ -20,7 +20,7 @@ public class PlainJavaTest {
 
   @Container
   private final JdbcDatabaseContainer<?> dbContainer =
-      new InformixContainerProvider().newInstance().withInitScript("test-schema.sql");
+      new InformixContainer().acceptLicense().withInitScript("test-schema.sql");
 
   @Test
   public void plainJavaTest() throws Exception {

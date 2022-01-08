@@ -38,6 +38,12 @@ public class InformixContainer extends JdbcDatabaseContainer<InformixContainer> 
     addExposedPort(INFORMIX_PORT);
   }
 
+  /** Call accept license to accept the Informix license. */
+  public InformixContainer acceptLicense() {
+    addEnv("LICENSE", "accept");
+    return self();
+  }
+
   @Override
   public String getDatabaseName() {
     return databaseName;
@@ -84,11 +90,6 @@ public class InformixContainer extends JdbcDatabaseContainer<InformixContainer> 
   public InformixContainer withPostInitFile(final MountableFile mountableFile) {
     setEnvAndCopyFile(mountableFile, FileType.RUN_FILE_POST_INIT);
     return self();
-  }
-
-  @Override
-  protected void configure() {
-    addEnv("LICENSE", "accept");
   }
 
   @Override

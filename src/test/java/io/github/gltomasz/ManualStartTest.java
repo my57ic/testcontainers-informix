@@ -44,7 +44,9 @@ class ManualStartTest {
 
   @Container
   private static final InformixContainer informixContainer =
-      new InformixContainer().withInitFile(MountableFile.forClasspathResource("test-schema.sql"));
+      new InformixContainer()
+          .withInitFile(MountableFile.forClasspathResource("test-schema.sql"))
+          .acceptLicense();
 
   @Autowired JdbcTemplate jdbcTemplate;
 
